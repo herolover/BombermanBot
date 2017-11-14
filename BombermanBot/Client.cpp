@@ -11,7 +11,7 @@ Client::Client(boost::asio::io_service &io_service)
 }
 
 void Client::run(const std::string &address, uint16_t port, const std::string &user_email, const std::string &user_password,
-                          const std::function<std::vector<Command>(Map &map)> &handler)
+                 const std::function<std::vector<Command>(Map &map)> &handler)
 {
     boost::asio::spawn(_io_service, [this, address, port, user_email, user_password, handler](boost::asio::yield_context yield)
     {
@@ -20,6 +20,8 @@ void Client::run(const std::string &address, uint16_t port, const std::string &u
             tcp::endpoint endpoint(boost::asio::ip::address::from_string(address), port);
             _socket.next_layer().async_connect(endpoint, yield);
             _socket.async_handshake(address, "/codenjoy-contest/ws?user=" + user_email + "&pwd=" + user_password, yield);
+
+            std::cout << "Connected" << std::endl;
 
             while (true)
             {
@@ -33,7 +35,7 @@ void Client::run(const std::string &address, uint16_t port, const std::string &u
         }
         catch (const std::exception &e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << "Exception: " << e.what() << std::endl;
         }
     });
 }
