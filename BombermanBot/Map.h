@@ -51,6 +51,8 @@ public:
     void update(const BufferType &buffer)
     {
         auto utf16_buffer_size = MultiByteToWideChar(CP_UTF8, 0, boost::asio::buffer_cast<char const*>(buffer), boost::asio::buffer_size(buffer), nullptr, 0);
+
+        _map_size = (std::size_t)sqrt(utf16_buffer_size - _board_prefix.size());
         _map.resize(utf16_buffer_size);
 
         MultiByteToWideChar(CP_UTF8, 0, boost::asio::buffer_cast<char const *>(buffer), boost::asio::buffer_size(buffer), &_map[0], utf16_buffer_size);
