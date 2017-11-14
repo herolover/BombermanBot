@@ -26,5 +26,5 @@ public:
     Client(boost::asio::io_service &io_service);
 
     void run(const std::string &address, uint16_t port, const std::string &user_email, const std::string &user_password,
-             const std::function<std::vector<Command>(Client &client, Map &map)> &handler);
+             const std::function<std::vector<Command>(Map &map)> &handler);
 };
