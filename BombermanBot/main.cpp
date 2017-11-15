@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Client.h"
+#include "Strategy.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,15 +15,7 @@ int main(int argc, char *argv[])
     }
 
     Client client(io_service);
-    client.run(argv[1], std::stoi(argv[2]), argv[3], argv[4],
-               [](Map &map)
-    {
-        std::vector<Command> commands;
-
-        commands = {Command::PlaceBomb, Command(rand() % 5)};
-
-        return commands;
-    });
+    client.run(argv[1], std::stoi(argv[2]), argv[3], argv[4], handler);
 
     io_service.run();
 

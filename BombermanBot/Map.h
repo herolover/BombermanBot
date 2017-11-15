@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <tuple>
 
 #include <Windows.h>
 
@@ -31,45 +33,125 @@ enum class MapObject : wchar_t
 	MeatChopper = L'&',
 	DeadMeatChopper = L'x',
 
-	Space = L' '
+	Space = L' ',
+
+    Danger = L'!'
+};
+
+inline bool is_other_player(MapObject map_object)
+{
+    return map_object == MapObject::OtherBomberman || map_object == MapObject::OtherBombBomberman;
+}
+
+inline bool is_me(MapObject map_object)
+{
+    return map_object == MapObject::Bomberman || map_object == MapObject::BombBomberman || map_object == MapObject::DeadBomberman;
+}
+
+inline bool is_bomb(MapObject map_object)
+{
+    return map_object == MapObject::BombTimer1 || map_object == MapObject::BombTimer2 || map_object == MapObject::BombTimer3 ||
+        map_object == MapObject::BombTimer4 || map_object == MapObject::BombTimer5;
+}
+
+inline bool is_wall(MapObject map_object)
+{
+    return map_object == MapObject::Wall || map_object == MapObject::WallDestroyable;
+}
+
+inline bool is_meat_chopper(MapObject map_object)
+{
+    return map_object == MapObject::MeatChopper;
+}
+
+inline bool is_free(MapObject map_object)
+{
+    return map_object == MapObject::Space || map_object == MapObject::Boom || map_object == MapObject::DestroyedWall ||
+        map_object == MapObject::DeadMeatChopper || map_object == MapObject::DeadBomberman || map_object == MapObject::OtherDeadBomberman ||
+        is_me(map_object);
+}
+
+struct vec2
+{
+    int x = 0;
+    int y = 0;
+
+    bool operator==(const vec2 &other) const
+    {
+        return std::tie(x, y) == std::tie(other.x, other.y);
+    }
+
+    bool operator!=(const vec2 &other) const
+    {
+        return !(*this == other);
+    }
+
+    bool operator<(const vec2 &other) const
+    {
+        return std::tie(x, y) < std::tie(other.x, other.y);
+    }
 };
 
 class Map
 {
 private:
-    std::size_t _map_size;
+    int _map_size;
     std::vector<std::underlying_type_t<MapObject>> _map;
 
     const std::string _board_prefix = "board=";
 
-    std::size_t get_address(int x, int y)
+    std::size_t get_address(int x, int y) const
     {
         return y * _map_size + x + _board_prefix.size();
     }
+
+    std::size_t get_address(const vec2 &pos) const
+    {
+        return get_address(pos.x, pos.y);
+    }
 public:
+    Map() = default;
+    Map(const Map &) = default;
+
     template<class BufferType>
     void update(const BufferType &buffer)
     {
         auto utf16_buffer_size = MultiByteToWideChar(CP_UTF8, 0, boost::asio::buffer_cast<char const*>(buffer), boost::asio::buffer_size(buffer), nullptr, 0);
 
-        _map_size = (std::size_t)sqrt(utf16_buffer_size - _board_prefix.size());
+        _map_size = (int)sqrt(utf16_buffer_size - _board_prefix.size());
         _map.resize(utf16_buffer_size);
 
         MultiByteToWideChar(CP_UTF8, 0, boost::asio::buffer_cast<char const *>(buffer), boost::asio::buffer_size(buffer), &_map[0], utf16_buffer_size);
     }
 
-    std::size_t map_size() const
+    vec2 get_me_coords() const
+    {
+        int distance = (int)std::distance(_map.begin(), std::find_if(_map.begin(), _map.end(),
+                                                                 [](wchar_t map_object)
+        {
+            return is_me(MapObject(map_object));
+        })) - _board_prefix.size();
+
+        return vec2{distance % _map_size, distance / _map_size};
+    }
+
+    int size() const
     {
         return _map_size;
     }
 
-    MapObject get(int x, int y)
+    MapObject get(int x, int y) const
     {
         return MapObject(_map[get_address(x, y)]);
     }
 
-    void set(int x, int y, MapObject object)
+    MapObject get(const vec2 &pos) const
     {
-        _map[get_address(x, y)] = static_cast<std::underlying_type_t<MapObject>>(object);
+        return get(pos.x, pos.y);
+    }
+
+    void set(const vec2 &pos, MapObject object)
+    {
+        _map[get_address(pos)] = static_cast<std::underlying_type_t<MapObject>>(object);
     }
 };

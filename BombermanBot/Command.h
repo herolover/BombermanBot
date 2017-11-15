@@ -5,6 +5,7 @@
 
 enum class Command : int
 {
+    Nothing = -1,
     MoveLeft = 0,
     MoveRight,
     MoveUp,
