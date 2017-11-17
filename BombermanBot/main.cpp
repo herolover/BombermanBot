@@ -14,8 +14,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    Strategy strategy;
+
     Client client(io_service);
-    client.run(argv[1], std::stoi(argv[2]), argv[3], argv[4], handler);
+    client.run(argv[1], std::stoi(argv[2]), argv[3], argv[4], strategy);
 
     io_service.run();
 

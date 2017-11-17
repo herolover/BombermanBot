@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <tuple>
+#include <functional>
+#include <map>
 
 #include <Windows.h>
 
@@ -34,9 +36,23 @@ enum class MapObject : wchar_t
 	DeadMeatChopper = L'x',
 
 	Space = L' ',
-
-    Danger = L'!'
 };
+
+inline int get_bomb_timer(MapObject map_object)
+{
+    const static std::map<MapObject, int> timers =
+    {
+        {MapObject::BombTimer1, 1},
+        {MapObject::BombTimer2, 2},
+        {MapObject::BombTimer3, 3},
+        {MapObject::BombTimer4, 4},
+        {MapObject::BombTimer5, 5},
+        {MapObject::BombBomberman, 5},
+        {MapObject::OtherBombBomberman, 5},
+    };
+
+    return timers.at(map_object);
+}
 
 inline bool is_other_player(MapObject map_object)
 {
@@ -51,7 +67,8 @@ inline bool is_me(MapObject map_object)
 inline bool is_bomb(MapObject map_object)
 {
     return map_object == MapObject::BombTimer1 || map_object == MapObject::BombTimer2 || map_object == MapObject::BombTimer3 ||
-        map_object == MapObject::BombTimer4 || map_object == MapObject::BombTimer5;
+        map_object == MapObject::BombTimer4 || map_object == MapObject::BombTimer5 ||
+        map_object == MapObject::BombBomberman || map_object == MapObject::OtherBombBomberman;
 }
 
 inline bool is_wall(MapObject map_object)
@@ -110,9 +127,6 @@ private:
         return get_address(pos.x, pos.y);
     }
 public:
-    Map() = default;
-    Map(const Map &) = default;
-
     template<class BufferType>
     void update(const BufferType &buffer)
     {
@@ -127,7 +141,7 @@ public:
     vec2 get_me_coords() const
     {
         int distance = (int)std::distance(_map.begin(), std::find_if(_map.begin(), _map.end(),
-                                                                 [](wchar_t map_object)
+                                                                     [](wchar_t map_object)
         {
             return is_me(MapObject(map_object));
         })) - _board_prefix.size();
@@ -150,8 +164,16 @@ public:
         return get(pos.x, pos.y);
     }
 
-    void set(const vec2 &pos, MapObject object)
+    void go_around(const std::function<void(const vec2 &pos, MapObject map_object)> &handler) const
     {
-        _map[get_address(pos)] = static_cast<std::underlying_type_t<MapObject>>(object);
+        for (int y = 0; y < size(); ++y)
+        {
+            for (int x = 0; x < size(); ++x)
+            {
+                vec2 pos{x, y};
+                auto map_object = get(pos);
+                handler(pos, map_object);
+            }
+        }
     }
 };

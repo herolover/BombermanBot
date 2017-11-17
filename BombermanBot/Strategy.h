@@ -1,6 +1,12 @@
 #pragma once
 
-#include "Command.h"
-#include "Map.h"
+#include "BaseStrategy.h"
+#include "BombTimers.h"
 
-std::vector<Command> handler(Map &map);
+class Strategy : public BaseStrategy
+{
+private:
+    BombTimers _bomb_timers;
+public:
+    std::vector<Command> get_decisions(const Map &map) override;
+};

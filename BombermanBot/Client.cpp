@@ -11,9 +11,9 @@ Client::Client(boost::asio::io_service &io_service)
 }
 
 void Client::run(const std::string &address, uint16_t port, const std::string &user_email, const std::string &user_password,
-                 const std::function<std::vector<Command>(Map &map)> &handler)
+                 BaseStrategy &strategy)
 {
-    boost::asio::spawn(_io_service, [this, address, port, user_email, user_password, handler](boost::asio::yield_context yield)
+    boost::asio::spawn(_io_service, [this, address, port, user_email, user_password, &strategy](boost::asio::yield_context yield)
     {
         try
         {
@@ -30,7 +30,7 @@ void Client::run(const std::string &address, uint16_t port, const std::string &u
 
                 _map.update(buffer.data());
 
-                _socket.async_write(boost::asio::buffer(commands_to_string(handler(_map))), yield);
+                _socket.async_write(boost::asio::buffer(commands_to_string(strategy.get_decisions(_map))), yield);
             }
         }
         catch (const std::exception &e)
