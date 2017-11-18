@@ -154,7 +154,7 @@ bool is_direct_path(const std::vector<vec2> &path)
     int diff_x = path[0].x - path[1].x;
     int diff_y = path[0].y - path[1].y;
 
-    for (int i = 0; i < path.size() - 1; ++i)
+    for (std::size_t i = 0; i < path.size() - 1; ++i)
     {
         if (path[i].x - path[i + 1].x != diff_x || path[i].y - path[i + 1].y != diff_y)
         {
@@ -163,4 +163,17 @@ bool is_direct_path(const std::vector<vec2> &path)
     }
 
     return true;
+}
+
+bool has_corner_at_first_move(const std::vector<vec2> &path)
+{
+    if (path.size() < 3)
+    {
+        return false;
+    }
+
+    auto i = path.size() - 1;
+
+    return path[i].x - path[i - 1].x != path[i - 1].x - path[i - 2].x &&
+           path[i].y - path[i - 1].y != path[i - 1].y - path[i - 2].y;
 }

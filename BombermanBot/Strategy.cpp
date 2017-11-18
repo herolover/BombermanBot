@@ -29,12 +29,23 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
     }
     else
     {
-        if (to_attack && path.size() <= 4 && is_direct_path(path))
+        if (to_attack)
         {
-            danger_points[path[0]] = 1; // make the target in a danger to ignore him in searching
-            path = get_path_to_nearest_other_player(map, me_pos, danger_points);
+            if (path.size() <= 5 && has_corner_at_first_move(path))
+            {
+                return {get_first_move(path), Command::PlaceBomb};
+            }
+            else if (path.size() <= 4 && is_direct_path(path))
+            {
+                danger_points[path[0]] = 1; // make the target in a danger to ignore him in searching
+                path = get_path_to_nearest_other_player(map, me_pos, danger_points);
 
-            return {Command::PlaceBomb, get_first_move(path)};
+                return {Command::PlaceBomb, get_first_move(path)};
+            }
+            else
+            {
+                return {get_first_move(path)};
+            }
         }
         else
         {

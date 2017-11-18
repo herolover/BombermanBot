@@ -14,6 +14,7 @@ std::vector<vec2> get_path_to_nearest_point(const Map &map, const vec2 &from_pos
 Command get_first_move(const std::vector<vec2> &path);
 
 bool is_direct_path(const std::vector<vec2> &path);
+bool has_corner_at_first_move(const std::vector<vec2> &path);
 
 inline std::vector<vec2> get_path_to_nearest_other_player(const Map &map, const vec2 &from_pos, const std::map<vec2, int> &danger_points)
 {
