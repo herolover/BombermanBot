@@ -59,7 +59,7 @@ std::map<vec2, int> get_danger_points(const Map &map, const BombTimers &bomb_tim
         {
             for (auto &danger_point : get_cross_danger(map, pos, 3))
             {
-                danger_points[danger_point] = bomb_timers.get_timer(pos);
+                danger_points[danger_point] = std::min(danger_points[danger_point], bomb_timers.get_timer(pos));
             }
         }
     });
