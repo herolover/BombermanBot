@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <functional>
 
 #include "Map.h"
@@ -15,6 +16,7 @@ Command get_first_move(const std::vector<vec2> &path);
 
 bool is_direct_path(const std::vector<vec2> &path);
 bool is_corner(const vec2 &a, const vec2 &b, const vec2 &c);
+std::set<vec2> get_cross_danger(const Map &map, const vec2 &center, int cross_size);
 int get_corners_amount(const std::vector<vec2> &path);
 bool has_corner_at_first_move(const std::vector<vec2> &path);
 

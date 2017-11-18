@@ -58,6 +58,15 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
             }
         }
 
+        auto cross_points = get_cross_danger(map, me_pos, 3);
+        for (auto &point : cross_points)
+        {
+            if (map.get(point) == MapObject::MeatChopper)
+            {
+                return {Command::PlaceBomb, get_first_move(path)};
+            }
+        }
+
         return {get_first_move(path)};
     }
 }
