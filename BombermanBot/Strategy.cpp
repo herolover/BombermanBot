@@ -45,6 +45,7 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
                     path.size() == 5 && direct_path)
             {
                 _my_bomb_pos = path[path.size() - 2];
+                _bomb_timers.add_bomb(_my_bomb_pos, 5);
                 return {get_first_move(path), Command::PlaceBomb};
             }
             else if (path.size() <= 4 && direct_path)

@@ -22,4 +22,9 @@ public:
     {
         return _bombs.at(pos);
     }
+
+    void add_bomb(const vec2 &pos, int timer)
+    {
+        _bombs[pos] = timer;
+    }
 };
