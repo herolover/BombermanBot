@@ -27,14 +27,14 @@ std::set<vec2> get_cross_danger(const Map &map, const vec2 &center, int cross_si
             vec2 pos{center.x + direction.x * i, center.y + direction.y * i};
             if (pos.x < 0 || pos.y < 0 || pos.x >= map.size() || pos.y >= map.size())
             {
-                continue;
+                break;
             }
 
             danger_cross.insert(pos);
 
             if (!is_free(map.get(pos)))
             {
-                continue;
+                break;
             }
         }
     }
