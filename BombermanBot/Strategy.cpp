@@ -38,21 +38,12 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
     }
     else
     {
-        if (to_attack && can_place_bomb())
+        if (to_attack && can_place_bomb()
+                && path.size() <= 5 && (is_direct_path(path)
+                                        || get_corners_amount(path) == 1 && has_corner_at_first_move(path)))
         {
-            if (path.size() <= 5 && get_corners_amount(path) == 1 && has_corner_at_first_move(path))
-            {
-                _my_bomb_pos = path[path.size() - 2];
-                return {get_first_move(path), Command::PlaceBomb};
-            }
-            else if (path.size() <= 4 && is_direct_path(path))
-            {
-                _my_bomb_pos = me_pos;
-                danger_points[path[0]] = 1; // make the target in a danger to ignore him in searching
-                path = get_path_to_nearest_other_player(map, me_pos, danger_points);
-
-                return {Command::PlaceBomb, get_first_move(path)};
-            }
+            _my_bomb_pos = path[path.size() - 2];
+            return {get_first_move(path), Command::PlaceBomb};
         }
 
         return {get_first_move(path)};
