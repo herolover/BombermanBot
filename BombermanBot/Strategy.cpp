@@ -31,7 +31,7 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
     {
         if (to_attack)
         {
-            if (path.size() <= 5 && has_corner_at_first_move(path))
+            if (path.size() <= 5 && get_corners_amount(path) == 1 && has_corner_at_first_move(path))
             {
                 return {get_first_move(path), Command::PlaceBomb};
             }

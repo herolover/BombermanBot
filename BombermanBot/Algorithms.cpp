@@ -165,6 +165,31 @@ bool is_direct_path(const std::vector<vec2> &path)
     return true;
 }
 
+bool is_corner(const vec2 &a, const vec2 &b, const vec2 &c)
+{
+    return a.x - b.x != b.x - c.x &&
+           a.y - b.y != b.y - c.y;
+}
+
+int get_corners_amount(const std::vector<vec2> &path)
+{
+    if (path.size() < 3)
+    {
+        return 0;
+    }
+
+    int corners_amount = 0;
+    for (std::size_t i = 0; i < path.size() - 2; ++i)
+    {
+        if (is_corner(path[i], path[i + 1], path[i + 2]))
+        {
+            corners_amount += 1;
+        }
+    }
+
+    return corners_amount;
+}
+
 bool has_corner_at_first_move(const std::vector<vec2> &path)
 {
     if (path.size() < 3)
@@ -174,6 +199,5 @@ bool has_corner_at_first_move(const std::vector<vec2> &path)
 
     auto i = path.size() - 1;
 
-    return path[i].x - path[i - 1].x != path[i - 1].x - path[i - 2].x &&
-           path[i].y - path[i - 1].y != path[i - 1].y - path[i - 2].y;
+    return is_corner(path[i], path[i - 1], path[i - 2]);
 }
