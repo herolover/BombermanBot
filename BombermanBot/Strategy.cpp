@@ -4,9 +4,18 @@
 
 #include "Algorithms.h"
 
+bool Strategy::can_place_bomb() const
+{
+    return !_bomb_timers.has_bomb(_my_bomb_pos);
+}
+
 std::vector<Command> Strategy::get_decisions(const Map &map)
 {
     _bomb_timers.update(map);
+    if (can_place_bomb())
+    {
+        _my_bomb_pos = vec2{-1, -1};
+    }
 
     auto danger_points = get_danger_points(map, _bomb_timers);
     auto me_pos = map.get_me_coords();
@@ -29,27 +38,23 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
     }
     else
     {
-        if (to_attack)
+        if (to_attack && can_place_bomb())
         {
             if (path.size() <= 5 && get_corners_amount(path) == 1 && has_corner_at_first_move(path))
             {
+                _my_bomb_pos = path[path.size() - 2];
                 return {get_first_move(path), Command::PlaceBomb};
             }
             else if (path.size() <= 4 && is_direct_path(path))
             {
+                _my_bomb_pos = me_pos;
                 danger_points[path[0]] = 1; // make the target in a danger to ignore him in searching
                 path = get_path_to_nearest_other_player(map, me_pos, danger_points);
 
                 return {Command::PlaceBomb, get_first_move(path)};
             }
-            else
-            {
-                return {get_first_move(path)};
-            }
         }
-        else
-        {
-            return {get_first_move(path)};
-        }
+
+        return {get_first_move(path)};
     }
 }
