@@ -5,6 +5,7 @@
 #include <queue>
 #include <map>
 #include <set>
+#include <utility>
 
 const std::array<vec2, 4> directions =
 {
@@ -85,21 +86,20 @@ std::vector<vec2> get_path_to_nearest_point(const Map &map, const vec2 &from_pos
 {
     std::vector<vec2> path;
 
-    int move_counter = 0;
     std::set<vec2> visited;
-    std::queue<vec2> to_visit;
+    // pos and move counter
+    std::queue<std::pair<vec2, int>> to_visit;
     std::map<vec2, vec2> came_from;
 
-    to_visit.push(from_pos);
+    to_visit.push(std::make_pair(from_pos, 0));
 
     while (!to_visit.empty())
     {
-        auto pos = to_visit.front();
+        auto pos = to_visit.front().first;
+        auto move_counter = to_visit.front().second + 1;
         to_visit.pop();
 
         visited.insert(pos);
-
-        move_counter += 1;
 
         for (auto &direction : directions)
         {
@@ -113,7 +113,7 @@ std::vector<vec2> get_path_to_nearest_point(const Map &map, const vec2 &from_pos
             if (is_safe_point_at_move(new_pos, danger_points, move_counter) && is_free(map_object) || is_search_point(new_pos, map_object, move_counter))
             {
                 came_from[new_pos] = pos;
-                to_visit.push(new_pos);
+                to_visit.push(std::make_pair(new_pos, move_counter));
                 if (is_search_point(new_pos, map_object, move_counter))
                 {
                     to_visit = {};
