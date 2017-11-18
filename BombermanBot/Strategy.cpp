@@ -22,7 +22,7 @@ std::vector<Command> Strategy::get_decisions(const Map &map)
 
     bool to_attack = true;
     std::vector<vec2> path = get_path_to_nearest_other_player(map, me_pos, danger_points);
-    if (path.empty() && danger_points.find(me_pos) != danger_points.end())
+    if ((path.empty() || path.size() == 2) && danger_points.find(me_pos) != danger_points.end())
     {
         to_attack = false;
         path = get_path_to_nearest_point(map, me_pos, danger_points,
